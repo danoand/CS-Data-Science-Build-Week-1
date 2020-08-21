@@ -1,15 +1,23 @@
 package main
 
 import (
+	"encoding/csv"
 	"fmt"
+	"log"
 	"math"
+	"os"
 	"regexp"
 	"strings"
+
+	"github.com/danoand/utils"
 )
 
 const k = .5
+const stdMdlDataFname = "data/standardSpamData.csv"
 
+var err error
 var rgxAlphaNum = regexp.MustCompile("[^a-z0-9]")
+var stdModel *classifier
 
 // message defines a message instance to be trained (and used for predictions)
 type message struct {
@@ -144,17 +152,99 @@ func foo() {
 	return
 }
 
-func main() {
-	myMessages := []message{
-		{"spam rules", true},
-		{"ham rules", false},
-		{"hello ham", false},
+// fitSpamModel2Data fits the "house" or standard classifier model
+//    1. loads csv file from disk
+//    2. creates a standard model for use by the frontend
+//    3. persists the model for reuse (future)
+func fitSpamModel2Data(fname string) (*classifier, error) {
+	var (
+		err      error
+		fcsv     *os.File
+		flines   [][]string
+		tmpModel *classifier
+		msgs     []message
+	)
+
+	log.Printf("INFO: %v - fitting the standard spam model for use downstream\n",
+		utils.FileLine())
+
+	// Validate the filenmame parameter
+	if len(fname) == 0 {
+		log.Printf("ERROR: %v - error - missing data filename\n",
+			utils.FileLine())
+
+		return tmpModel, fmt.Errorf("missing filename")
 	}
 
-	myModel := newClassifier(k)
-	myModel.fit(myMessages)
+	// Create a new classifier/model object
+	tmpModel = newClassifier(k)
 
-	myPred := myModel.predict("hello spam")
+	// Open the data file containing the underlying data for the standard model
+	fcsv, err = os.Open(stdMdlDataFname)
+	if err != nil {
+		log.Printf("ERROR: %v - error opening the model data file: %v. See: %v\n",
+			utils.FileLine(),
+			stdMdlDataFname,
+			err)
+
+		return tmpModel, err
+	}
+
+	// Read the csv file
+	flines, err = csv.NewReader(fcsv).ReadAll()
+	if err != nil {
+		log.Printf("ERROR: %v - error reading the csv data file. See: %v\n",
+			utils.FileLine(),
+			err)
+
+		return tmpModel, err
+	}
+	log.Printf("INFO: %v - read in the standard model data with %v rows\n",
+		utils.FileLine(),
+		len(flines))
+
+	// Iterate through the csv data and generate an array of message objects
+	//    skip the first row (assume it's a header row)
+	for i := 1; i < len(flines); i++ {
+		var tmpMsg = message{}
+		var tmpLne = flines[i]
+
+		// Ignore invalid lines
+		if len(tmpLne[0]) == 0 || len(tmpLne[1]) == 0 {
+			continue
+		}
+
+		if tmpLne[0] == "spam" {
+			tmpMsg.isSpam = true
+		}
+
+		tmpMsg.Text = tmpLne[1]
+
+		// append the new message object to our messages array
+		msgs = append(msgs, tmpMsg)
+	}
+
+	// Fit the temporary model using the default dataset
+	tmpModel.fit(msgs)
+
+	log.Printf("INFO: %v - fit model with %v message datapoints\n",
+		utils.FileLine(),
+		len(msgs))
+
+	return tmpModel, err
+}
+
+func main() {
+	stdModel, err = fitSpamModel2Data("data/standardSpamData.csv")
+	if err != nil {
+		log.Fatalf("ERROR: %v - error fitting the standard model. See: %v\n",
+			utils.FileLine(),
+			err)
+	}
+	foo()
+
+	prdStr := "07732584351 - Rodger Burns - MSG = We tried to call you re your reply to our sms for a free nokia mobile + free camcorder. Please call now 08000930705 for delivery tomorrow"
+	myPred := stdModel.predict(prdStr)
 
 	fmt.Println(myPred)
 	foo()
