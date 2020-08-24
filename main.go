@@ -17,6 +17,22 @@ var err error
 var rgxAlphaNum = regexp.MustCompile("[^a-z0-9]")
 var stdModel *classifier
 
+// getModelInfo returns information on the currently applicable classifier
+func getModelInfo(c *gin.Context) {
+	var respMap = make(map[string]interface{})
+	var rMap = make(map[string]interface{})
+
+	rMap["hasbeentrained"] = stdModel.HasBeenFit
+	rMap["numobs"] = stdModel.TrnObsCount
+	rMap["numtkns"] = len(stdModel.Tokens)
+	rMap["numspam"] = len(stdModel.TokenSpamCount)
+	rMap["numham"] = len(stdModel.TokenHamCount)
+
+	respMap["content"] = rMap
+
+	c.JSON(http.StatusOK, respMap)
+}
+
 // handlerPred handles a request to generate a spam prediction for a
 //     given string of text
 func handlerPred(c *gin.Context) {
@@ -92,7 +108,18 @@ func main() {
 
 	// Set up a gin web server
 	r := gin.Default()
+	r.Static("/vendor", "./www/vendor")
+	r.Static("/fonts", "./www/fonts")
+	r.Static("/scripts", "./www/scripts")
+	r.Static("/views", "./www/views")
+	r.Static("/styles", "./www/styles")
+	r.Static("/images", "./www/images")
+	r.StaticFile("/", "./www/index.html")
+	r.StaticFile("/index.html", "./www/index.html")
+	r.StaticFile("/index.htm", "./www/index.html")
+	r.StaticFile("/favicon.ico", "./www/favicon.ico")
 	r.POST("/predict", handlerPred)
+	r.GET("/getModelInfo", getModelInfo)
 
 	// Start the web server
 	port := "localhost:8090"

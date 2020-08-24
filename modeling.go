@@ -23,6 +23,7 @@ type classifier struct {
 	Tokens         map[string]bool // map: set of classifier tokens
 	TokenSpamCount map[string]int  // map: count of spam tokens
 	TokenHamCount  map[string]int  // map: count of ham tokens
+	TrnObsCount    int             // count of traing observations
 	SpamCount      int             // count of spam messages
 	HamCount       int             // count of ham messages
 	HasBeenFit     bool            // indicator that model training has been exected
@@ -42,6 +43,8 @@ func newClassifier(k float64) *classifier {
 
 // fit is a method on classifier that "fits" the Bayes classifier
 func (cl *classifier) fit(msgs []message) {
+	cl.TrnObsCount = 0
+
 	// Tally up the number of spam and ham messages in the set of message objects
 	for _, msg := range msgs {
 		if msg.isSpam {
@@ -63,6 +66,8 @@ func (cl *classifier) fit(msgs []message) {
 				cl.TokenHamCount[tkn] = cl.TokenHamCount[tkn] + 1
 			}
 		}
+
+		cl.TrnObsCount = cl.TrnObsCount + 1
 	}
 
 	// Flag that the model has been "fit"/trained
