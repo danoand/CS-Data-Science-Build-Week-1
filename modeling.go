@@ -119,7 +119,7 @@ func (cl *classifier) predict(txt string) float64 {
 	pSpam = math.Exp(lnPSpam)
 	pHam = math.Exp(lnPHam)
 
-	return pSpam / (pSpam + pHam)
+	return (pSpam / (pSpam + pHam))
 }
 
 // tokenize returns a slice of word tokens extracted from a string of text

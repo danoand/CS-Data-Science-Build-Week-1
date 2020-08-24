@@ -39,13 +39,16 @@ func handlerPred(c *gin.Context) {
 	var err error
 	var bbytes []byte
 	var prms = make(map[string]string)
-	var rMap = make(map[string]interface{})
+	var respMap = make(map[string]interface{})
+	var cMap = make(map[string]interface{})
 
 	// Has the standard model been trained?
 	if !stdModel.HasBeenFit {
 		// model has not been flagged as trained
-		rMap["msg"] = "model has not yet been trained"
-		c.JSON(http.StatusInternalServerError, rMap)
+		respMap["msg"] = "model has not yet been trained"
+		cMap["havepred"] = false
+		respMap["content"] = cMap
+		c.JSON(http.StatusInternalServerError, respMap)
 		return
 	}
 
@@ -56,8 +59,10 @@ func handlerPred(c *gin.Context) {
 		log.Printf("ERROR: %v - error fetching the request body. See: %v\n",
 			utils.FileLine(),
 			err)
-		rMap["msg"] = "error fetching the request body"
-		c.JSON(http.StatusInternalServerError, rMap)
+		respMap["msg"] = "an error occurred, please try again"
+		cMap["havepred"] = false
+		respMap["content"] = cMap
+		c.JSON(http.StatusInternalServerError, respMap)
 		return
 	}
 
@@ -68,8 +73,10 @@ func handlerPred(c *gin.Context) {
 		log.Printf("ERROR: %v - error parsing the request body data. See: %v\n",
 			utils.FileLine(),
 			err)
-		rMap["msg"] = "error parsing the request body data"
-		c.JSON(http.StatusInternalServerError, rMap)
+		respMap["msg"] = "an error occurred, please try again"
+		cMap["havepred"] = false
+		respMap["content"] = cMap
+		c.JSON(http.StatusInternalServerError, respMap)
 		return
 	}
 
@@ -78,17 +85,20 @@ func handlerPred(c *gin.Context) {
 		// error missing text value
 		log.Printf("ERROR: %v - error missing text value\n",
 			utils.FileLine())
-		rMap["msg"] = "error missing text value"
-		c.JSON(http.StatusBadRequest, rMap)
+		respMap["msg"] = "error missing text value"
+		cMap["havepred"] = false
+		respMap["content"] = cMap
+		c.JSON(http.StatusBadRequest, respMap)
 		return
 	}
 
 	// Invoke the prediction
 	pred := stdModel.predict(prms["text"])
-	rMap["msg"] = "prediction of spam"
-	rMap["prediction"] = pred
-	rMap["text"] = prms["text"]
-	c.JSON(http.StatusOK, rMap)
+	respMap["msg"] = "a spam prediction"
+	cMap["havepred"] = true
+	cMap["prediction"] = fmt.Sprintf("%.2f", pred*100.0)
+	respMap["content"] = cMap
+	c.JSON(http.StatusOK, respMap)
 }
 
 func main() {
@@ -118,7 +128,7 @@ func main() {
 	r.StaticFile("/index.html", "./www/index.html")
 	r.StaticFile("/index.htm", "./www/index.html")
 	r.StaticFile("/favicon.ico", "./www/favicon.ico")
-	r.POST("/predict", handlerPred)
+	r.POST("/getModelPred", handlerPred)
 	r.GET("/getModelInfo", getModelInfo)
 
 	// Start the web server
