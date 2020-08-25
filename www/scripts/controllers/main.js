@@ -32,6 +32,11 @@ function dashCtrl($http, $scope, growl) {
     $scope.getPred = function() {
         $scope.pred.havepred = false;
 
+        if ($scope.spam_text.length == 0 || $scope.spam_text == undefined) {
+            growl.warning("no text entered", {ttl: 2500});
+            return 
+        }
+
         $http({
             method: 'POST',
             data: {"text": $scope.spam_text},
