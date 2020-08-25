@@ -27,7 +27,7 @@ function pageTitle($rootScope, $timeout) {
                 // Default title
                 var title = 'HOMER | AngularJS Responsive WebApp';
                 // Create your own title pattern
-                if (toState.data && toState.data.pageTitle) title = 'HOMER | ' + toState.data.pageTitle;
+                if (toState.data && toState.data.pageTitle) title = 'CSPT10 Bld Wk 1 | ' + toState.data.pageTitle;
                 $timeout(function() {
                     element.text(title);
                 });
