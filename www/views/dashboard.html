@@ -44,7 +44,7 @@
                             </div>
                         </form>
                         <hr>
-                        <p>High level characteristics of the classifier model</p>
+                        <p>High level characteristics of the Go standard library classifier model</p>
                         <table class="table">
                             <thead>
                             <tr>
@@ -120,7 +120,8 @@
                                 <h1 class="text-success" ng-show="pred.havepred">{{pred.prediction}}%</h1>
                                 <h1 class="text-success" ng-hide="pred.havepred"><i class="pe-7s-cloud-download"></i></h1>
                                 <small>
-                                    Enter text and click submit to generate a prediction - the probability of a spam message.
+                                    Enter text and click submit to generate a prediction - the probability of a spam message - using 
+                                    a model implemented using the Go standard library.
                                 </small>
                             </div>
                         </div>
@@ -142,7 +143,7 @@
                                 <h1 class="text-info" ng-show="pypred.havepred">{{pypred.prediction}}</h1>
                                 <h1 class="text-info" ng-hide="pypred.havepred"><i class="pe-7s-cloud-download"></i></h1>
                                 <small>
-                                    Enter text and click submit to generate a prediction - the probability of a spam message.
+                                    Enter text and click submit to generate a prediction using Scikit Learn's <code>MultinomialNB</code> model.
                                 </small>
                             </div>
                         </div>

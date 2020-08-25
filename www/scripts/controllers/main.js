@@ -39,6 +39,7 @@ function dashCtrl($http, $scope, growl) {
           }).then(function successCallback(response) {
               console.log('success response: ' + JSON.stringify(response));
               $scope.pred = response.data.content;
+              growl.success("Predictions Updated", {ttl: 1000});
             }, function errorCallback(response) {
                 console.log('error response: ' + JSON.stringify(response));
                 growl.warning(response.data.msg, {ttl: 2500});
