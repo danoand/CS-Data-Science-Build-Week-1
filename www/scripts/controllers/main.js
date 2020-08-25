@@ -14,6 +14,7 @@ function appCtrl($http, $scope) {
 
 function dashCtrl($http, $scope, growl) {
     $scope.info             = {};
+    $scope.spam_text        = "";
     $scope.pred             = {};
     $scope.pred.havepred    = false;
     $scope.pypred           = {};
@@ -30,10 +31,11 @@ function dashCtrl($http, $scope, growl) {
         });
 
     $scope.getPred = function() {
-        $scope.pred.havepred = false;
+        $scope.pred.havepred    = false;
+        $scope.pypred.havepred  = false;
 
         if ($scope.spam_text.length == 0 || $scope.spam_text == undefined) {
-            growl.warning("no text entered", {ttl: 2500});
+            growl.warning("no text entered, please enter submit again", {ttl: 2500});
             return 
         }
 
