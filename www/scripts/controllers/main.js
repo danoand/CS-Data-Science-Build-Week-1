@@ -68,6 +68,10 @@ function dashCtrl($http, $scope, growl) {
     $scope.fillTestMsg = function(val) {
         $scope.spam_text = "";
 
+        if (val == "clear") {
+            return; 
+        }
+
         $http({
             method: 'GET',
             url: '/getRandMsg/' + val
