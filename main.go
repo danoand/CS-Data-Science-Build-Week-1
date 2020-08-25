@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
 	"regexp"
 
@@ -220,10 +221,33 @@ func hdlrPyPred(c *gin.Context) {
 	c.JSON(http.StatusOK, respMap)
 }
 
-//
+// genRandMsg generates a random spam or ham text string for use on the frontend
+func genRandMsg(c *gin.Context) {
+	var idx int
+	var class, rtStr string
+	var rspMap = make(map[string]string)
+
+	// Determine what type of message is being fetched
+	class = c.Param("class")
+
+	// Randomly find a spam message from our original dataset
+	if class == "spam" {
+		idx = rand.Intn(len(msgStore["spam"]))
+		rtStr = msgStore["spam"][idx].Text
+	}
+
+	// Randomly find a spam message from our original dataset
+	if class == "ham" {
+		idx = rand.Intn(len(msgStore["ham"]))
+		rtStr = msgStore["ham"][idx].Text
+	}
+
+	rspMap["content"] = rtStr
+	c.JSON(http.StatusOK, rspMap)
+}
 
 func main() {
-	stdModel, err = fitSpamModel2Data("data/standardSpamData.csv")
+	stdModel, msgStore, err = fitSpamModel2Data("data/standardSpamData.csv")
 	if err != nil {
 		log.Fatalf("ERROR: %v - error fitting the standard model. See: %v\n",
 			utils.FileLine(),
@@ -252,6 +276,7 @@ func main() {
 	r.POST("/getModelPred", hdlrPred)
 	r.POST("/getPyModelPred", hdlrPyPred)
 	r.GET("/getModelInfo", getModelInfo)
+	r.GET("/getRandMsg/:class", genRandMsg)
 
 	// Start the web server
 	port := "localhost:8090"

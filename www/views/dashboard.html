@@ -40,7 +40,14 @@
                                 <span class="help-block m-b-none">Enter some text and see if it is spam!</span>
                             </div>
                             <div>
-                                <button class="btn btn-sm btn-primary m-t-n-xs" ng-click="getPred()"><strong>Submit</strong></button>
+                                <button class="btn btn-sm btn-primary m-t-n-xs pull-right" ng-click="getPred()"><strong>Submit</strong></button>
+                            </div>
+                            <div class="btn-group">
+                                <button data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle">Select Test Message <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a ng-click="fillTestMsg('spam')">Spam Message</a></li>
+                                    <li><a ng-click="fillTestMsg('ham')">Ham Message</a></li>
+                                </ul>
                             </div>
                         </form>
                         <hr>

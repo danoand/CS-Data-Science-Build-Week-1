@@ -11,6 +11,9 @@ import (
 	"github.com/danoand/utils"
 )
 
+// msgStore serves as a mini db or store of messages for use downstream
+var msgStore = make(map[string][]message)
+
 // message defines a message instance to be trained (and used for predictions)
 type message struct {
 	Text   string
@@ -157,14 +160,19 @@ func foo() {
 //    1. loads csv file from disk
 //    2. creates a model for use by the frontend
 //    3. persists the model for reuse (future)
-func fitSpamModel2Data(fname string) (*classifier, error) {
+func fitSpamModel2Data(fname string) (*classifier, map[string][]message, error) {
 	var (
 		err      error
 		fcsv     *os.File
 		flines   [][]string
 		tmpModel *classifier
 		msgs     []message
+		msgStr   = make(map[string][]message)
 	)
+
+	// Initialize the message "store"
+	msgStr["spam"] = []message{}
+	msgStr["ham"] = []message{}
 
 	log.Printf("INFO: %v - fitting the standard spam model for use downstream\n",
 		utils.FileLine())
@@ -174,7 +182,7 @@ func fitSpamModel2Data(fname string) (*classifier, error) {
 		log.Printf("ERROR: %v - error - missing data filename\n",
 			utils.FileLine())
 
-		return tmpModel, fmt.Errorf("missing filename")
+		return tmpModel, msgStr, fmt.Errorf("missing filename")
 	}
 
 	// Create a new classifier/model object
@@ -188,7 +196,7 @@ func fitSpamModel2Data(fname string) (*classifier, error) {
 			stdMdlDataFname,
 			err)
 
-		return tmpModel, err
+		return tmpModel, msgStr, err
 	}
 
 	// Read the csv file
@@ -198,7 +206,7 @@ func fitSpamModel2Data(fname string) (*classifier, error) {
 			utils.FileLine(),
 			err)
 
-		return tmpModel, err
+		return tmpModel, msgStr, err
 	}
 	log.Printf("INFO: %v - read in the standard model data with %v rows\n",
 		utils.FileLine(),
@@ -215,11 +223,15 @@ func fitSpamModel2Data(fname string) (*classifier, error) {
 			continue
 		}
 
+		// Assign the text value to the "message" object
+		tmpMsg.Text = tmpLne[1]
+
 		if tmpLne[0] == "spam" {
 			tmpMsg.isSpam = true
+			msgStr["spam"] = append(msgStr["spam"], tmpMsg)
+		} else {
+			msgStr["ham"] = append(msgStr["ham"], tmpMsg)
 		}
-
-		tmpMsg.Text = tmpLne[1]
 
 		// append the new message object to our messages array
 		msgs = append(msgs, tmpMsg)
@@ -232,5 +244,6 @@ func fitSpamModel2Data(fname string) (*classifier, error) {
 		utils.FileLine(),
 		len(msgs))
 
-	return tmpModel, err
+	return tmpModel, msgStr, err
 }
+

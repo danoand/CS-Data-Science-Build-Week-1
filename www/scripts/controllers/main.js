@@ -64,4 +64,20 @@ function dashCtrl($http, $scope, growl) {
                 growl.warning(rsp.data.msg, {ttl: 2500});
             });
     };
+
+    $scope.fillTestMsg = function(val) {
+        $scope.spam_text = "";
+
+        $http({
+            method: 'GET',
+            url: '/getRandMsg/' + val
+          }).then(function successCallback(response) {
+              console.log('success response: ' + JSON.stringify(response));
+              $scope.spam_text = response.data.content;
+              growl.success("Random " + val + " message", {ttl: 1000});
+            }, function errorCallback(response) {
+                console.log('error response: ' + JSON.stringify(response));
+                growl.warning("an error occurred", {ttl: 1000});
+            });
+    };
 }
