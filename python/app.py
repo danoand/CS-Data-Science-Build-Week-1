@@ -98,8 +98,11 @@ def predict():
 
   # Construct the return object
   return_object = {}
-  return_object["msg"]              = "your prediction"
-  return_object["content"]          = dict(pred=float(tmp_pred[0]))
+  return_object["msg"]              = "Scikit Learn spam prediction"
+  return_object["content"]          = dict(
+    prediction=str(float(tmp_pred[0])*100.0)+"%",
+    havepred=True
+    )
   return jsonify(return_object)
 
 # Start the flask app

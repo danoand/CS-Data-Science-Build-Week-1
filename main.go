@@ -9,8 +9,6 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/danoand/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -116,7 +114,7 @@ func hdlrPyPred(c *gin.Context) {
 		resp            *http.Response
 		prms            = make(map[string]string)
 		respMap         = make(map[string]interface{})
-		respSvc         = make(map[string]float32)
+		respSvc         = make(map[string]interface{})
 		cMap            = make(map[string]interface{})
 	)
 
@@ -216,7 +214,10 @@ func hdlrPyPred(c *gin.Context) {
 		return
 	}
 
-	spew.Dump(respSvc)
+	// Return to the caller
+	respMap = respSvc
+
+	c.JSON(http.StatusOK, respMap)
 }
 
 //

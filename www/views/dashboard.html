@@ -104,23 +104,47 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="hpanel">
-                    <div class="panel-heading">
-                        Classifier Prediction
+                <div class="col-md-12">
+                    <div class="hpanel">
+                        <div class="panel-heading">
+                            Classifier Prediction
+                        </div>
+                        <div class="panel-body">
+                            <div class="stats-title pull-left">
+                                <h4>Spam Prediction</h4>
+                            </div>
+                            <div class="stats-icon pull-right">
+                                <i class="pe-7s-tools fa-3x"></i>
+                            </div>
+                            <div class="m-t-xl">
+                                <h1 class="text-success" ng-show="pred.havepred">{{pred.prediction}}%</h1>
+                                <h1 class="text-success" ng-hide="pred.havepred"><i class="pe-7s-cloud-download"></i></h1>
+                                <small>
+                                    Enter text and click submit to generate a prediction - the probability of a spam message.
+                                </small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        <div class="stats-title pull-left">
-                            <h4>Spam Prediction</h4>
+                </div>
+                <div class="col-md-12">
+                    <div class="hpanel">
+                        <div class="panel-heading">
+                            Scikit Learn Bayes Classifier Prediction
                         </div>
-                        <div class="stats-icon pull-right">
-                            <i class="pe-7s-science fa-4x"></i>
-                        </div>
-                        <div class="m-t-xl">
-                            <h1 class="text-success" ng-show="pred.havepred">{{pred.prediction}}%</h1>
-                            <h1 class="text-success" ng-hide="pred.havepred"><i class="pe-7s-cloud-download"></i></h1>
-                            <small>
-                                Enter text and click submit to generate a prediction - the probability of a spam message.
-                            </small>
+                        <div class="panel-body">
+                            <div class="stats-title pull-left">
+                                <h4>Scikit Learn Spam Prediction</h4>
+                            </div>
+                            <div class="stats-icon pull-right">
+                                <i class="pe-7s-science fa-3x"></i>
+                            </div>
+                            <div class="m-t-xl">
+                                <h1 class="text-info" ng-show="pypred.havepred">{{pypred.prediction}}</h1>
+                                <h1 class="text-info" ng-hide="pypred.havepred"><i class="pe-7s-cloud-download"></i></h1>
+                                <small>
+                                    Enter text and click submit to generate a prediction - the probability of a spam message.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
