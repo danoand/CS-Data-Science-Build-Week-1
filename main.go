@@ -30,8 +30,14 @@ func getModelInfo(c *gin.Context) {
 	rMap["hasbeentrained"] = stdModel.HasBeenFit //
 	rMap["numobs"] = stdModel.TrnObsCount        //
 	rMap["numtkns"] = len(stdModel.Tokens)       //
-	rMap["numspam"] = stdModel.SpamCount         // number of spam messages
-	rMap["numham"] = stdModel.HamCount           // number of ham messages
+	rMap["numspam"] = fmt.Sprintf(
+		"%d (%.1f",
+		stdModel.SpamCount,
+		100.0*float32(stdModel.SpamCount)/float32(stdModel.TrnObsCount)) + "%)"
+	rMap["numham"] = fmt.Sprintf(
+		"%d (%.1f",
+		stdModel.HamCount,
+		100.0*float32(stdModel.HamCount)/float32(stdModel.TrnObsCount)) + "%)"
 
 	respMap["content"] = rMap
 

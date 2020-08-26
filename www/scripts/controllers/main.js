@@ -80,10 +80,10 @@ function dashCtrl($http, $scope, growl) {
           }).then(function successCallback(response) {
               console.log('success response: ' + JSON.stringify(response));
               $scope.spam_text = response.data.content;
-              growl.success("Random " + val + " message", {ttl: 1000});
+              growl.success("Random " + val + " message", {ttl: 4000});
             }, function errorCallback(response) {
                 console.log('error response: ' + JSON.stringify(response));
-                growl.warning("an error occurred", {ttl: 1000});
+                growl.warning("an error occurred", {ttl: 4000});
             });
     };
 }
