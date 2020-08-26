@@ -66,7 +66,9 @@ function dashCtrl($http, $scope, growl) {
     };
 
     $scope.fillTestMsg = function(val) {
-        $scope.spam_text = "";
+        $scope.spam_text        = "";
+        $scope.pred.havepred    = false;
+        $scope.pypred.havepred  = false;
 
         if (val == "clear") {
             return; 
