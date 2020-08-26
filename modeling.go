@@ -26,7 +26,7 @@ type classifier struct {
 	Tokens         map[string]bool // map: set of classifier tokens
 	TokenSpamCount map[string]int  // map: count of spam tokens
 	TokenHamCount  map[string]int  // map: count of ham tokens
-	TrnObsCount    int             // count of traing observations
+	TrnObsCount    int             // count of training observations
 	SpamCount      int             // count of spam messages
 	HamCount       int             // count of ham messages
 	HasBeenFit     bool            // indicator that model training has been exected
@@ -50,11 +50,6 @@ func (cl *classifier) fit(msgs []message) {
 
 	// Tally up the number of spam and ham messages in the set of message objects
 	for _, msg := range msgs {
-		if msg.isSpam {
-			cl.SpamCount = cl.SpamCount + 1
-		} else {
-			cl.HamCount = cl.HamCount + 1
-		}
 
 		// Increment the spam and ham token (word) counts
 		_, mapTkns := tokenize(msg.Text)
@@ -162,12 +157,13 @@ func foo() {
 //    3. persists the model for reuse (future)
 func fitSpamModel2Data(fname string) (*classifier, map[string][]message, error) {
 	var (
-		err      error
-		fcsv     *os.File
-		flines   [][]string
-		tmpModel *classifier
-		msgs     []message
-		msgStr   = make(map[string][]message)
+		err            error
+		ctrSpm, ctrHam int
+		fcsv           *os.File
+		flines         [][]string
+		tmpModel       *classifier
+		msgs           []message
+		msgStr         = make(map[string][]message)
 	)
 
 	// Initialize the message "store"
@@ -228,8 +224,10 @@ func fitSpamModel2Data(fname string) (*classifier, map[string][]message, error) 
 
 		if tmpLne[0] == "spam" {
 			tmpMsg.isSpam = true
+			ctrSpm = ctrSpm + 1
 			msgStr["spam"] = append(msgStr["spam"], tmpMsg)
 		} else {
+			ctrHam = ctrHam + 1
 			msgStr["ham"] = append(msgStr["ham"], tmpMsg)
 		}
 
@@ -237,13 +235,18 @@ func fitSpamModel2Data(fname string) (*classifier, map[string][]message, error) 
 		msgs = append(msgs, tmpMsg)
 	}
 
+	// Assign the count value of spam and ham messages respectively
+	tmpModel.SpamCount = ctrSpm
+	tmpModel.HamCount = ctrHam
+
 	// Fit the temporary model using the default dataset
 	tmpModel.fit(msgs)
 
-	log.Printf("INFO: %v - fit model with %v message datapoints\n",
+	log.Printf("INFO: %v - fit model with %v message datapoints [%v, %v]\n",
 		utils.FileLine(),
-		len(msgs))
+		len(msgs),
+		ctrSpm,
+		ctrHam)
 
 	return tmpModel, msgStr, err
 }
-

@@ -27,11 +27,11 @@ func getModelInfo(c *gin.Context) {
 	var respMap = make(map[string]interface{})
 	var rMap = make(map[string]interface{})
 
-	rMap["hasbeentrained"] = stdModel.HasBeenFit
-	rMap["numobs"] = stdModel.TrnObsCount
-	rMap["numtkns"] = len(stdModel.Tokens)
-	rMap["numspam"] = len(stdModel.TokenSpamCount)
-	rMap["numham"] = len(stdModel.TokenHamCount)
+	rMap["hasbeentrained"] = stdModel.HasBeenFit //
+	rMap["numobs"] = stdModel.TrnObsCount        //
+	rMap["numtkns"] = len(stdModel.Tokens)       //
+	rMap["numspam"] = stdModel.SpamCount         // number of spam messages
+	rMap["numham"] = stdModel.HamCount           // number of ham messages
 
 	respMap["content"] = rMap
 
