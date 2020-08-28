@@ -104,10 +104,12 @@ func hdlrPred(c *gin.Context) {
 	}
 
 	// Invoke the prediction
-	pred := stdModel.predict(prms["text"])
+	pred, numr, dnom := stdModel.predict(prms["text"])
 	respMap["msg"] = "a spam prediction"
 	cMap["havepred"] = true
 	cMap["prediction"] = fmt.Sprintf("%.2f", pred*100.0)
+	cMap["numerator"] = numr
+	cMap["denominator"] = dnom
 	respMap["content"] = cMap
 	c.JSON(http.StatusOK, respMap)
 }
@@ -259,13 +261,6 @@ func main() {
 			utils.FileLine(),
 			err)
 	}
-	foo()
-
-	prdStr := "07732584351 - Rodger Burns - MSG = We tried to call you re your reply to our sms for a free nokia mobile + free camcorder. Please call now 08000930705 for delivery tomorrow"
-	myPred := stdModel.predict(prdStr)
-
-	fmt.Println(myPred)
-	foo()
 
 	// Set up a gin web server
 	r := gin.Default()

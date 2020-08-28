@@ -87,10 +87,12 @@ func (cl *classifier) calcBayesProb(tkn string) (float64, float64) {
 }
 
 // predict is a method on classifier that predicts the probability that a message is "spam"
-func (cl *classifier) predict(txt string) float64 {
-	var ok bool
-	var lnPSpam, lnPHam float64
-	var pSpam, pHam float64
+func (cl *classifier) predict(txt string) (float64, float64, float64) {
+	var (
+		ok              bool
+		lnPSpam, lnPHam float64
+		pSpam, pHam     float64
+	)
 
 	// tokenize the inbound string of text
 	_, mapTkns := tokenize(txt)
@@ -116,8 +118,10 @@ func (cl *classifier) predict(txt string) float64 {
 	// Calculate the overall probability of spam and ham
 	pSpam = math.Exp(lnPSpam)
 	pHam = math.Exp(lnPHam)
+	numr := pSpam
+	dnom := pSpam + pHam
 
-	return (pSpam / (pSpam + pHam))
+	return (pSpam / (pSpam + pHam)), numr, dnom
 }
 
 // tokenize returns a slice of word tokens extracted from a string of text
