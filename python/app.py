@@ -39,14 +39,16 @@ def gen_model(DF):
     vctrizr = CountVectorizer()
     # Generate the word token counts
     tkn_counts = vctrizr.fit_transform(X_train.values)
+    tkn_counts_X_test = vctrizr.transform(X_test.values)
 
     # Stand up a classifier object
     clssifier = MultinomialNB()
     # Fit the classifier model
-    model_fit = clssifier.fit(tkn_counts, y_train.values)
+    model_fit   = clssifier.fit(tkn_counts, y_train.values)
+    model_score = clssifier.score(tkn_counts_X_test, y_test.values)
 
     # Return the fit model and the vectorizer for use downstream
-    return model_fit, vctrizr
+    return model_fit, vctrizr, model_score
 
 # predict predicts a spam classification using the passed model, vectorizer, and 
 #    prediction source data
@@ -62,7 +64,7 @@ def mdl_pred(mdl, vtzr, val):
 # Create and clean up the underlying model dataset
 df = read_wrangle_csv("../data/standardSpamData.csv")
 # Generate and fit a Bayesian Classifier model
-model, vctrizr  = gen_model(df)
+model, vctrizr, model_scr = gen_model(df)
 
 # --- FLASK APP ---
 # /status can be used to verify that the Flask app is running and responding
@@ -81,6 +83,7 @@ def test():
 def predict():
   global model
   global vctrizr
+  global model_scr
 
   # Get the request's body as json
   jsn      = request.get_json(force=True)
@@ -101,8 +104,8 @@ def predict():
   return_object["msg"]              = "Scikit Learn spam prediction"
   return_object["content"]          = dict(
     prediction=str(float(tmp_pred[0])*100.0)+"%",
-    havepred=True
-    )
+    score=str(round(float(model_scr)*100.0, 4))+"%",
+    havepred=True)
   return jsonify(return_object)
 
 # Start the flask app
